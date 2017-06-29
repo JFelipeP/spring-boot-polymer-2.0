@@ -1,0 +1,101 @@
+
+
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+
+<link rel="import" href="../../bower_components/paper-datatable-api/paper-datatable-api.html">
+<link rel="import" href="../../bower_components/paper-datatable-api/paper-datatable-api-column.html">
+
+
+<dom-module id="data-view">
+  <template>
+    <style>
+      :host {
+	      display: block;	
+	      margin-top: 5px;      
+	      --paper-datatable-api-header: {
+	          color: rgb(66, 66, 66);
+	      }
+
+	      --paper-datatable-api-checked-checkbox-color: rgb(66, 66, 66);
+	
+	      --paper-datatable-api-tr-selected-background: beige;
+	
+	      --paper-datatable-api-tr-hover-background-color: beige;
+	
+	      --paper-datatable-api-tr-even-background-color: #FFFFF;
+	
+	      --paper-datatable-api-tr-odd-background-color: #EEE;     
+      }
+           
+      paper-card {
+        width: 100%;
+      }
+       
+    </style>
+   	  <paper-card heading="Cars List">
+          <div class="card-content">
+            <paper-datatable-api data="[[items]]" selectable >
+              <paper-datatable-api-column header="Make" property="make">
+                <template>
+                  <span>[[value]]</span>
+                </template>
+              </paper-datatable-api-column>
+              
+              <paper-datatable-api-column header="Model" property="model">
+                <template>
+                  <span>[[value]]</span>
+                </template>
+              </paper-datatable-api-column>
+              
+              <paper-datatable-api-column header="Year" property="year">
+                <template>
+                  <span>[[value]]</span>
+                </template>
+              </paper-datatable-api-column>  
+              
+              <paper-datatable-api-column header="Power" property="power">
+                <template>
+                  <span>[[value]]</span>
+                </template>
+              </paper-datatable-api-column>  
+              
+              <paper-datatable-api-column header="Top speed" property="speed">
+                <template>
+                  <span>[[value]]</span>
+                </template>
+              </paper-datatable-api-column>     
+                         
+            </paper-datatable-api>
+          </div>
+        </paper-card>
+  
+    
+  </template>
+   
+     
+  <script>
+    class DataView extends Polymer.Element {
+      static get is() { return 'data-view'; }
+      static get properties() {
+    	  return {
+    		  items: {
+    			  type: Array,
+    			  observer: 'itemsChanged'
+    			  }
+    	  }
+      }
+          
+      
+      itemsChanged(newValue, oldValue) {
+    	  console.log(newValue);
+      }
+       
+      
+    }
+
+    window.customElements.define(DataView.is, DataView);
+  </script>
+</dom-module>

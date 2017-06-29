@@ -11,16 +11,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 
+<link rel="import" href="./elements/data-view.html">
+
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="my-home">
   <template>
     <style include="shared-styles">
       :host {
-        display: block;
-
-        padding: 10px;
-      }     
+	      display: block;	      
+	  }
     </style>
     
     <iron-ajax
@@ -31,25 +31,31 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     on-response="handleResponse"
     last-response="{{data}}"    
     debounce-duration="300"></iron-ajax>
-
-   
-
     
+   <data-view items="[[data]]"></data-view>
+	    	
   </template>
-
+   
+     
   <script>
     class MyHome extends Polymer.Element {
       static get is() { return 'my-home'; }
       static get properties() {
     	  return {
     		  data: {
-    			  type: Array    		  }
+    			  type: Array,
+    			  observer: 'dataChanged'
+    			  }
     	  }
       }
       
       handleResponse(event) {
-    	  //console.log(event.detail.response);
-    	  console.log(this.data);
+    	  console.log(event.detail.response);
+    	  //console.log(this.data);
+      }
+      
+      dataChanged(newValue, oldValue) {
+    	  console.log(newValue);
       }
        
       
