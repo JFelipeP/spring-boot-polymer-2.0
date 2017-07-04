@@ -1,76 +1,181 @@
-
-
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/paper-card/paper-card.html">
 
-<link rel="import" href="../../bower_components/paper-datatable-api/paper-datatable-api.html">
-<link rel="import" href="../../bower_components/paper-datatable-api/paper-datatable-api-column.html">
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid.html">
 
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-selection-column.html">
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-sorter.html">
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-filter.html">
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-column-group.html">
+
+<link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-styles/color.html">
 
 <dom-module id="data-view">
   <template>
     <style>
       :host {
 	      display: block;	
-	      margin-top: 5px;      
-	      --paper-datatable-api-header: {
-	          color: rgb(66, 66, 66);
-	      }
-
-	      --paper-datatable-api-checked-checkbox-color: rgb(66, 66, 66);
-	
-	      --paper-datatable-api-tr-selected-background: beige;
-	
-	      --paper-datatable-api-tr-hover-background-color: beige;
-	
-	      --paper-datatable-api-tr-even-background-color: #FFFFF;
-	
-	      --paper-datatable-api-tr-odd-background-color: #EEE;     
-      }
-           
+	      margin-top: 5px; 	        
+      }           
       paper-card {
         width: 100%;
       }
+
+      vaadin-grid#material {
+          font-family: Roboto, sans-serif;
+          --divider-color: rgba(0, 0, 0, var(--dark-divider-opacity));
+
+          --vaadin-grid-cell: {
+            padding: 0;
+          };
+
+          --vaadin-grid-header-cell: {
+            height: 64px;
+            color: rgba(0, 0, 0, var(--dark-secondary-opacity));
+            font-size: 12px;
+          };
+
+          --vaadin-grid-body-cell: {
+            height: 48px;
+            color: rgba(0, 0, 0, var(--dark-primary-opacity));
+            font-size: 13px;
+          };
+
+          --vaadin-grid-body-row-hover-cell: {
+            background-color: var(--paper-grey-200);
+          };
+
+          --vaadin-grid-body-row-selected-cell: {
+            background-color: var(--paper-grey-100);
+          };
+
+          --vaadin-grid-focused-cell: {
+            box-shadow: none;
+            font-weight: bold;
+          };
+        }
+
+        vaadin-grid#material .cell {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          padding-right: 56px;
+        }
+
+        vaadin-grid#material .cell.last {
+          padding-right: 24px;
+        }
+
+        vaadin-grid#material .cell.numeric {
+          text-align: right;
+        }
+
+        vaadin-grid#material paper-checkbox {
+          --primary-color: var(--paper-indigo-500);
+          margin: 0 24px;
+        }
+
+        vaadin-grid#material vaadin-grid-sorter {
+          --vaadin-grid-sorter-arrow: {
+            display: none !important;
+          };
+        }
+
+        vaadin-grid#material vaadin-grid-sorter .cell {
+          flex: 1;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        vaadin-grid#material vaadin-grid-sorter iron-icon {
+          transform: scale(0.8);
+        }
+
+        vaadin-grid#material vaadin-grid-sorter:not([direction]) iron-icon {
+          color: rgba(0, 0, 0, var(--dark-disabled-opacity));
+        }
+
+        vaadin-grid#material vaadin-grid-sorter[direction] {
+          color: rgba(0, 0, 0, var(--dark-primary-opacity));
+        }
+
+        vaadin-grid#material vaadin-grid-sorter[direction=desc] iron-icon {
+          transform: scale(0.8) rotate(180deg);
+        }
        
     </style>
-   	  <paper-card heading="Cars List">
-          <div class="card-content">
-            <paper-datatable-api data="[[items]]" selectable >
-              <paper-datatable-api-column header="Make" property="make">
-                <template>
-                  <span>[[value]]</span>
+   	  
+       <vaadin-grid id="material" items="[[items]]" size="200" active-item="{{activeItem}}" on-active-item-changed="activeItemChanged" on-selected-items-changed="selectedItemsChanged" >
+
+              <vaadin-grid-selection-column width="66px" flex="0">
+                <template class="header">
+                  
                 </template>
-              </paper-datatable-api-column>
+                <template>
+                  <paper-checkbox checked="{{selected}}"></paper-checkbox>
+                </template>
+              </vaadin-grid-selection-column>
+
+              <vaadin-grid-column width="100px" flex="0">
+                <template class="header">
+                  <div class="cell">ID</div>
+                </template>
+                <template>
+                  <div class="cell">[[item.id]]</div>
+                </template>
+              </vaadin-grid-column>
+
+              <vaadin-grid-column flex="2">
+                <template class="header">
+                  <div class="cell">Make</div>
+                </template>
+                <template>
+                  <div class="cell">[[item.make]]</div>
+                </template>
+              </vaadin-grid-column>
               
-              <paper-datatable-api-column header="Model" property="model">
-                <template>
-                  <span>[[value]]</span>
+              <vaadin-grid-column flex="2">
+                <template class="header">
+                  <div class="cell">Model</div>
                 </template>
-              </paper-datatable-api-column>
+                <template>
+                  <div class="cell">[[item.model]]</div>
+                </template>
+              </vaadin-grid-column>    
               
-              <paper-datatable-api-column header="Year" property="year">
-                <template>
-                  <span>[[value]]</span>
+              <vaadin-grid-column flex="2">
+                <template class="header">
+                  <div class="cell">Year</div>
                 </template>
-              </paper-datatable-api-column>  
+                <template>
+                  <div class="cell">[[item.year]]</div>
+                </template>
+              </vaadin-grid-column> 
               
-              <paper-datatable-api-column header="Power" property="power">
-                <template>
-                  <span>[[value]]</span>
+              <vaadin-grid-column flex="2">
+                <template class="header">
+                  <div class="cell">Power</div>
                 </template>
-              </paper-datatable-api-column>  
+                <template>
+                  <div class="cell">[[item.power]]</div>
+                </template>
+              </vaadin-grid-column> 
               
-              <paper-datatable-api-column header="Top speed" property="speed">
-                <template>
-                  <span>[[value]]</span>
+              <vaadin-grid-column flex="2">
+                <template class="header">
+                  <div class="cell">Top speed</div>
                 </template>
-              </paper-datatable-api-column>     
-                         
-            </paper-datatable-api>
-          </div>
-        </paper-card>
+                <template>
+                  <div class="cell">[[item.speed]]</div>
+                </template>
+              </vaadin-grid-column>           
+
+      </vaadin-grid>
   
     
   </template>
@@ -82,16 +187,56 @@
       static get properties() {
     	  return {
     		  items: {
-    			  type: Array,
-    			  observer: 'itemsChanged'
-    			  }
+    			  type: Array    			  
+    	      },
+    	      activeItem: {
+    	    	  type: Object    	    	 
+    	      },
+    	      selectedItems: {
+    	    	  type: Array
+    	      },
+    	      selected: {
+    	    	  type: Object,
+    	    	  value: {}
+    	      }
     	  }
       }
-          
       
-      itemsChanged(newValue, oldValue) {
-    	  console.log(newValue);
+      constructor() {
+    	  super();    	 
       }
+      
+      connectedCallback() {
+    	  super.connectedCallback(); 
+      }
+      
+      ready() {
+    	  super.ready();
+      }     
+            
+      
+      activeItemChanged() {
+    	  let item = this.$.material.activeItem;
+    	  //console.log('active item');
+    	  //console.log(item);
+      }
+      
+      selectedItemsChanged() {
+    	  let items = this.$.material.selectedItems;
+    	  // if has selected one more item the array will have two itmes
+    	  if (items.length == 2) {
+    		  // the selected item must logically be the second one, for it was more recent selected.
+    		  this.selected = items[1];
+    		  // it is important to deselect the first one
+    		  this.$.material.deselectItem(items[0]);
+    		  // this will uncheck the checkbox andd
+    		  // remove the item from the array
+    	  }    	  
+    	  console.log('active item');
+    	  this.selected = items[0];
+    	  console.log(this.selected);    	  
+      }
+          
        
       
     }

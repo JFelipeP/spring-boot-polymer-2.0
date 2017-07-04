@@ -1,0 +1,136 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+
+<link rel="import" href="../../bower_components/neon-animation/neon-animation.html">
+
+<link rel="import" href="../../bower_components/neon-animation/web-animations.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/fade-out-animation.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+
+
+
+<dom-module id="data-form">
+  <template>
+    <style>
+      :host {
+	      display: block;		     
+	  }	  
+	   paper-dialog#dialog {
+	  	width: 50%;
+	  }
+	  .dialog-form-content {
+	  	padding: 20px;
+	  }
+
+       
+    </style>
+    
+    <paper-dialog id="dialog" entry-animation="scale-up-animation" exit-animation="fade-out-animation" >
+	  
+	  <h2>Register a new car</h2>
+	  
+	  <paper-dialog-scrollable>
+	  
+	  	<iron-form id="form">
+	  	
+	  		<form class="dialog-form-content">	  	
+		  		<paper-input value="{{car.make}}" label="Make" required></paper-input>
+		  		<paper-input value="{{car.model}}" label="Model" required></paper-input>
+		  		<paper-input value="{{car.year}}" label="Year" required></paper-input>
+		  		<paper-input value="{{car.power}}" label="Power" required></paper-input>
+		  		<paper-input value="{{car.speed}}" label="Top speed" required></paper-input> 
+	  		</form>	  
+	  		
+	  	</iron-form>
+	   
+	  </paper-dialog-scrollable>
+	  
+	  <div class="buttons">
+	    <paper-button dialog-dismiss>Cancel</paper-button>
+	    <paper-button autofocus on-click="save">Save</paper-button>
+	  </div>
+	  
+	</paper-dialog>
+   	  
+    
+  </template>
+   
+     
+  <script>
+    class DataForm extends Polymer.Element {
+      static get is() { return 'data-form'; }
+      static get properties() {
+    	  return {
+    		  car: {
+    			  type: Object,
+    			  value: {id: null, make: '', model: '', year: '', power: '', speed: ''},
+    			  notify: true
+    		  }
+    	  }
+      } // properties
+      
+      open() {
+    	  this.$.dialog.open();
+      }
+      
+      close() {
+    	  this.$.dialog.close();
+      }
+      
+      reset() {
+    	  this.$.form.reset();
+      }
+      
+      save() {
+    	  this.$.form.validate();    	  
+    	  if (this.$.form.validate()) { 
+    		  
+    		  this.postCar(this.car)
+    		  	.then(response => {
+    		  		// console.log(response);
+    		  		if (response.status === 200) {
+    		  			this.dispatchEvent(new CustomEvent('save', {detail: {valid: true}}));
+    		  		}
+    		  	})
+    		  	.catch(err => {
+    		  		console.error(err);
+    		  	});
+    		  
+    		  this.$.dialog.close();    		  
+    	  } else {     		  
+    		  this.dispatchEvent(new CustomEvent('save', {detail: {valid: false}}));
+    	  }
+      }
+      
+      postCar(json) {    	  
+    	  
+    	  let URL = '/api/save';
+    	  let headers = new Headers();
+    	  headers.append('Accept', 'application/json');
+    	  headers.append('Content-Type', 'application/json');
+    	  
+    	  
+		  let options = {
+					method: 'post',
+					body: JSON.stringify(json),
+					headers: headers,
+					mode: 'same-origin',
+					cache: 'default',
+					credentials: 'same-origin' // same-origin, omit, include
+		  };
+    	  return fetch(URL, options);
+      }
+          
+            
+      
+    }
+
+    window.customElements.define(DataForm.is, DataForm);
+  </script>
+</dom-module>

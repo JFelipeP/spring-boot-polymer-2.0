@@ -10,20 +10,36 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+
 
 <link rel="import" href="./elements/data-view.html">
-
-<link rel="import" href="shared-styles.html">
+<link rel="import" href="./elements/data-form.html">
 
 <dom-module id="my-home">
   <template>
-    <style include="shared-styles">
+    <style>
       :host {
 	      display: block;	      
 	  }
+	  paper-card {
+	  	width: 100%;
+	  	padding: 4px 0;
+	  	background-color: white;
+	  	color: rgb(66,66,66);
+	  }
+	  paper-button#new {
+	  	background-color: rgb(66,66,66);
+	  	color: white;
+	  }
+	 	  
     </style>
     
     <iron-ajax
+    id="ironajax"
     auto
     method="GET"
     url="http://localhost:8080/api/cars"    
@@ -32,7 +48,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     last-response="{{data}}"    
     debounce-duration="300"></iron-ajax>
     
-   <data-view items="[[data]]"></data-view>
+    <paper-card>
+  		<paper-button id="new" on-click="handleNew" raised>New</paper-button>
+  		<paper-icon-button icon="delete"></paper-icon-button>
+  		<paper-icon-button icon="create"></paper-icon-button>
+	</paper-card>
+    
+   <data-view id="dataview" items="[[data]]"></data-view>
+   
+   <data-form id="dataform" car="{{car}}"></data-form>
 	    	
   </template>
    
@@ -45,19 +69,49 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     		  data: {
     			  type: Array,
     			  observer: 'dataChanged'
-    			  }
+    		  },
+    		  car: {
+    			  type: Object,
+    			  value: {id: null, make: '', model: '', year: '', power: '', speed: ''},
+    			  notify: true
+    		  }
     	  }
       }
       
+      constructor() {
+    	  super();
+      }
+      
+      connectedCallback() {
+    	  super.connectedCallback();
+    	  this.$.dataform.addEventListener('save', event => {
+    		  //console.log(event.detail);
+    		  if (event.detail.valid) {
+    			  this.getFreshData();
+    		  }
+    	  });
+      }
+
+      
       handleResponse(event) {
-    	  console.log(event.detail.response);
+    	  //console.log(event.detail.response);
     	  //console.log(this.data);
       }
       
       dataChanged(newValue, oldValue) {
-    	  console.log(newValue);
+    	  //console.log(newValue);
       }
-       
+      
+      handleNew() {
+    	  this.$.dataform.reset();
+    	  this.$.dataform.open();
+      }
+      
+      getFreshData() {
+    	  this.$.ironajax.generateRequest();
+      }
+         
+             
       
     }
 
