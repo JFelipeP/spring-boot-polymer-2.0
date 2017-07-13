@@ -1,0 +1,103 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-styles/color.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/neon-animation/neon-animation.html">
+<link rel="import" href="../../bower_components/neon-animation/web-animations.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/fade-out-animation.html">
+
+<dom-module id="dialog-confirm">
+  <template>
+    <style>
+      :host {
+	      display: block;
+      }           
+      paper-dialog {
+      	width: 400px;      	
+      }
+   </style>
+   	  
+       <paper-dialog 
+       	  id="confirm" 
+       	  entry-animation="scale-up-animation" 
+       	  exit-animation="fade-out-animation"
+       	  on-iron-overlay-closed="onClosed"
+       	  no-cancel-on-esc-key
+       	  no-cancel-on-outside-click       	 
+       	  always-on-top
+       	  >
+		  <h2>[[header]]</h2>
+		  
+		  <paper-dialog-scrollable>
+		    [[text]]
+		  </paper-dialog-scrollable>
+		  
+		  <div class="buttons">
+		    <paper-button dialog-dismiss>Cancel</paper-button>
+		    <paper-button dialog-confirm autofocus>Delete</paper-button>
+		  </div>
+	   </paper-dialog>
+    
+  </template>
+   
+     
+  <script>
+    class DialogConfirm extends Polymer.Element {
+      static get is() { return 'dialog-confirm'; }
+      static get properties() {
+    	  return {
+    		  closingReason: {
+    			  type: Object,
+    			  notify: true    			  
+    	      },
+    	      header: {
+    	    	  type: String,
+    	    	  value: 'Header'
+    	      },
+    	      text: {
+    	    	  type: String,
+    	    	  value: 'Text'
+    	      }
+    	    
+    	  }
+      }
+      
+      constructor() {
+    	  super();    	 
+      }
+      
+      connectedCallback() {
+    	  super.connectedCallback(); 
+      }
+      
+      ready() {
+    	  super.ready();
+      }     
+      
+      open() {
+      	  this.$.confirm.open();
+      }
+      
+      close() {
+    	  this.$.confirm.close();
+      }
+      
+      onClosed() {
+    	 // console.log(this.$.confirm.closingReason);
+    	  if (this.$.confirm.closingReason.confirmed) {
+    		  this.dispatchEvent(new CustomEvent('deleteallowed', {detail: {allowed: true}}));
+    	  }
+      }
+            
+    
+    }
+      
+     
+
+    window.customElements.define(DialogConfirm.is, DialogConfirm);
+  </script>
+</dom-module>
