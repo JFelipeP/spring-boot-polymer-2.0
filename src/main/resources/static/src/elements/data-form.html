@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
 
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 
@@ -40,11 +41,11 @@
 	  	<iron-form id="form">
 	  	
 	  		<form class="dialog-form-content">	  	
-		  		<paper-input value="{{car.make}}" label="Make" required></paper-input>
-		  		<paper-input value="{{car.model}}" label="Model" required></paper-input>
-		  		<paper-input value="{{car.year}}" label="Year" required></paper-input>
-		  		<paper-input value="{{car.power}}" label="Power" required></paper-input>
-		  		<paper-input value="{{car.speed}}" label="Top speed" required></paper-input> 
+		  		<paper-input value="{{car.make}}" label="Make" maxlength="50" required></paper-input>
+		  		<paper-input value="{{car.model}}" label="Model" maxlength="50" required></paper-input>
+		  		<paper-input value="{{car.year}}" label="Year" maxlength="4" required></paper-input>
+		  		<paper-input value="{{car.power}}" label="Power" maxlength="20" required></paper-input>
+		  		<paper-input value="{{car.speed}}" label="Top speed" maxlength="20" required></paper-input> 
 	  		</form>	  
 	  		
 	  	</iron-form>
@@ -52,8 +53,19 @@
 	  </paper-dialog-scrollable>
 	  
 	  <div class="buttons">
-	    <paper-button dialog-dismiss>Cancel</paper-button>
-	    <paper-button autofocus on-click="save">Save</paper-button>
+	  
+	    <paper-button dialog-dismiss>Cancel</paper-button>	   
+	    
+	    <template is="dom-if" if="[[!edit]]">	    	
+	    	 <!-- This button will be rendered only if 'data-form' property 'edit' is false -->	    	
+	    	 <paper-button autofocus on-click="save">Save</paper-button>	    
+	    </template>
+	    
+	    <template is="dom-if" if="[[edit]]">
+	    	<!-- This button will be rendered only if 'data-form' property 'edit' is true -->	    	
+	    	<paper-button autofocus on-click="editar">Edit</paper-button>	    
+	    </template>	    
+	    
 	  </div>
 	  
 	</paper-dialog>
@@ -71,6 +83,11 @@
     			  type: Object,
     			  value: {id: null, make: '', model: '', year: '', power: '', speed: ''},
     			  notify: true
+    		  },
+    		  edit: {
+    			  type: Boolean,
+    			  value: false,
+    			  notify: true
     		  }
     	  }
       } // properties
@@ -80,7 +97,7 @@
       }
       
       close() {
-    	  this.$.dialog.close();
+    	  this.$.dialog.close();    	 
       }
       
       reset() {
@@ -108,17 +125,53 @@
     	  }
       }
       
-      postCar(json) {    	  
+      editar() {
+    	  this.$.form.validate();    	  
+    	  if (this.$.form.validate()) {     		  
+    		  this.editCar(this.car)
+    		  	.then(response => {
+    		  		// console.log(response);
+    		  		if (response.status === 200) {
+    		  			this.dispatchEvent(new CustomEvent('edit', {detail: {valid: true}}));
+    		  		}
+    		  	})
+    		  	.catch(err => {
+    		  		console.error(err);
+    		  	});    		  
+    		  this.$.dialog.close();    		  
+    	  } else {     		  
+    		  this.dispatchEvent(new CustomEvent('edit', {detail: {valid: false}}));
+    	  }
+      }
+      
+      editCar(data) { 
     	  
-    	  let URL = '/api/save';
+    	  let URL = `/api/cars/${this.car.id}`;
     	  let headers = new Headers();
     	  headers.append('Accept', 'application/json');
-    	  headers.append('Content-Type', 'application/json');
+    	  headers.append('Content-Type', 'application/json');    	  
     	  
+		  let options = {
+					method: 'put',
+					body: JSON.stringify(data),
+					headers: headers,
+					mode: 'same-origin',
+					cache: 'default',
+					credentials: 'same-origin' // same-origin, omit, include
+		  };
+    	  return fetch(URL, options);
+      }
+      
+      postCar(data) {    	  
+    	  
+    	  let URL = '/api/cars';
+    	  let headers = new Headers();
+    	  headers.append('Accept', 'application/json');
+    	  headers.append('Content-Type', 'application/json');    	  
     	  
 		  let options = {
 					method: 'post',
-					body: JSON.stringify(json),
+					body: JSON.stringify(data),
 					headers: headers,
 					mode: 'same-origin',
 					cache: 'default',

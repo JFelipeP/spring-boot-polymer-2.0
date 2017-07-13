@@ -187,16 +187,20 @@
       static get properties() {
     	  return {
     		  items: {
-    			  type: Array    			  
+    			  type: Array,
+    			  notify: true,
+    			  observer: "itemsChanged"
     	      },
     	      activeItem: {
     	    	  type: Object    	    	 
     	      },
     	      selectedItems: {
-    	    	  type: Array
+    	    	  type: Array,
+    	    	  notify: true
     	      },
     	      selected: {
     	    	  type: Object,
+    	    	  notify: true,
     	    	  value: {}
     	      }
     	  }
@@ -221,6 +225,11 @@
     	  //console.log(item);
       }
       
+      itemsChanged(n, o) {
+    	  let size = n.length;
+    	  this.dispatchEvent(new CustomEvent('tmschng', {detail: {itemsSize: size}}));
+      }
+      
       selectedItemsChanged() {
     	  let items = this.$.material.selectedItems;
     	  // if has selected one more item the array will have two itmes
@@ -232,9 +241,9 @@
     		  // this will uncheck the checkbox andd
     		  // remove the item from the array
     	  }    	  
-    	  console.log('active item');
+    	 // console.log('active item:');
     	  this.selected = items[0];
-    	  console.log(this.selected);    	  
+    	  //console.log(this.selected);    	  
       }
           
        
