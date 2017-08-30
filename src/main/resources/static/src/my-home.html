@@ -132,6 +132,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       
       handleNew() {    	
     	  // clean form before openning it.
+		  this.$.dataform.edit = false;
     	  this.car = {id: null, make: '', model: '', year: '', power: '', speed: ''};
     	  this.$.dataform.open();
       }
